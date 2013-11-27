@@ -1,0 +1,21 @@
+<eval expr="&showmodel">
+<HTML>
+  <HEAD>
+    <TITLE>Snowflake #ID#</TITLE>
+  </HEAD>
+  <BODY>
+    <h1>#CAPTION#</h1> (snowflake #id#)
+    <hr>
+    <applet code="Cutfold.class" codebase=".." width=500 height=500>
+      alt="Your browser understands the &lt;APPLET&gt; tag but isn't running the applet, for some reason."
+      Your browser is completely ignoring the &lt;APPLET&gt; tag!
+    <param name="model" value="model#id#.xml">
+    <param name="readonly" value="#readonly#">
+    </applet>
+        <br>
+    <a href="./">to Gallery</a>
+    <a href="../">Make a flake</a>
+    <if expr="#readonly#"><a href="./showmodel.pfm?id=#id#&readonly=0">cut/fold this snowflake</a></if>
+  </BODY>
+</HTML>
+</eval>

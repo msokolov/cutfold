@@ -1,0 +1,38 @@
+<html>
+  <head>
+    <title>cutfold</title>
+    <link rel="stylesheet" type="text/css" href="styles.css"></link>
+    <script src="vertex.js"></script>
+    <script src="polygon.js"></script>
+    <script src="mousetrap.js"></script>
+    <script src="panel.js"></script>
+    <script src="cutfold.js"></script>
+    <script src="intersection.js"></script>
+    <script src="fold.js"></script>
+    <script src="affine.js"></script>
+    <!--
+        <script src="test.js"></script>
+    -->
+  </head>
+  <body onload="init()">
+    <h1>cutfold</h1>
+    <canvas id="cutfold" width="500" height="500">
+      <!-- note this width defines the canvas coordinates, but the width in
+           css controls the actual display width. We probably want them to
+           be the same though to avoid aliasing issues.
+      -->
+    </canvas>
+    <div>
+      <input type="button" id="clear-button" value="clear" onclick="clear_canvas();"></input>
+      <input type="button" id="fold-button" value="fold"></input>
+      <input type="button" id="cut-button" value="cut" onclick="clear_canvas();"></input>
+      <input type="button" id="discard-button" value="discard"></input>
+      <input type="button" id="unfold-button" value="unfold"></input>
+      <input type="button" id="reset-button" value="reset"></input>
+      <input type="button" id="spin-button" value="spin"></input>
+      <input type="button" id="undo-button" value="undo"></input>
+      <input type="button" id="save-button" value="save"></input>
+      <input type="button" id="help-button" value="help"></input>
+    </div>
+  </body>
+</html>

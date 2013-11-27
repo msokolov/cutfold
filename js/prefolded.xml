@@ -1,0 +1,73 @@
+<polygon id="274" faceup="false" z="15">
+  <vertex id="30855" x="-0.7175410381250491" y="-0.00925270875606543" is_crease="false"><fold twin="30903" level="4"></vertex>
+  <vertex id="30857" x="-0.37475103479008753" y="49.999999999999986" is_crease="false"></vertex>
+  <vertex id="30859" x="-41.095020156220876" y="50.558262973241796" is_crease="false"><fold twin="30867" level="3"></vertex>
+  <vertex id="30861" x="-0.8680866356969175" y="-0.006771943304059391" is_crease="false"><fold twin="30897" level="1"></vertex>
+</polygon>
+<polygon id="279" faceup="true" z="14">
+  <vertex id="30895" x="-0.3748596247350793" y="49.98415793358065" is_crease="false"><fold twin="30847" level="4"></vertex>
+  <vertex id="30897" x="-0.7175410381250492" y="-0.009252708756079642" is_crease="false"><fold twin="30861" level="1"></vertex>
+  <vertex id="30899" x="-0.8680866356968893" y="-0.006771943304073602" is_crease="false"><fold twin="30827" level="3"></vertex>
+  <vertex id="30901" x="-41.26440695409372" y="50.77118124961183" is_crease="false"></vertex>
+</polygon>
+<polygon id="271" faceup="false" z="13">
+  <vertex id="30841" x="-0.7119059771351998" y="0.8128400778741849" is_crease="false"><fold twin="30885" level="4"></vertex>
+  <vertex id="30843" x="-0.37348268339620105" y="50.18503837557476" is_crease="false"></vertex>
+  <vertex id="30845" x="-10.426425389104725" y="48.09035366442796" is_crease="false"><fold twin="30881" level="1"></vertex>
+</polygon>
+<polygon id="277" faceup="true" z="12">
+  <vertex id="30879" x="-0.37388084264650767" y="50.12695136494669" is_crease="false"><fold twin="30831" level="4"></vertex>
+  <vertex id="30881" x="-0.7119059771351988" y="0.812840077874327" is_crease="false"><fold twin="30845" level="1"></vertex>
+  <vertex id="30883" x="-10.426425389104722" y="48.09035366442807" is_crease="false"></vertex>
+</polygon>
+<polygon id="273" faceup="false" z="9">
+  <vertex id="30821" x="-0.7125281805069569" y="0.722067519305611" is_crease="false"><fold twin="30873" level="4"></vertex>
+  <vertex id="30823" x="-0.364039606758501" y="51.56267833394146" is_crease="false"></vertex>
+  <vertex id="30825" x="-39.36878896984362" y="59.77475886027317" is_crease="false"></vertex>
+  <vertex id="30827" x="-41.264406954093666" y="50.77118124961177" is_crease="false"><fold twin="30899" level="3"></vertex>
+  <vertex id="30829" x="-0.8680866356968613" y="-0.006771943304102024" is_crease="false"><fold twin="30865" level="1"></vertex>
+</polygon>
+<polygon id="275" faceup="true" z="8">
+  <vertex id="30863" x="-0.3636413995931058" y="51.62077233484855" is_crease="false"><fold twin="30815" level="4"></vertex>
+  <vertex id="30865" x="-0.7125281805069558" y="0.7220675193057815" is_crease="false"><fold twin="30829" level="1"></vertex>
+  <vertex id="30867" x="-0.8680866356968895" y="-0.006771943304087813" is_crease="false"><fold twin="30859" level="3"></vertex>
+  <vertex id="30869" x="-41.095020156220876" y="50.558262973241796" is_crease="false"></vertex>
+  <vertex id="30871" x="-39.05450335693827" y="59.99073023091145" is_crease="false"></vertex>
+</polygon>
+<polygon id="272" faceup="false" z="7">
+  <vertex id="30815" x="-0.7125281805069558" y="0.7220675193057815" is_crease="false"><fold twin="30863" level="4"></vertex>
+  <vertex id="30817" x="-0.3636413995931058" y="51.62077233484855" is_crease="false"></vertex>
+  <vertex id="30819" x="-10.44303212038784" y="49.58453178519304" is_crease="false"><fold twin="30875" level="1"></vertex>
+</polygon>
+<polygon id="276" faceup="true" z="6">
+  <vertex id="30873" x="-0.36403960675850144" y="51.562678333941406" is_crease="false"><fold twin="30821" level="4"></vertex>
+  <vertex id="30875" x="-0.7125281805069569" y="0.722067519305611" is_crease="false"><fold twin="30819" level="1"></vertex>
+  <vertex id="30877" x="-10.44303212038784" y="49.58453178519304" is_crease="false"></vertex>
+</polygon>
+<polygon id="270" faceup="false" z="3">
+  <vertex id="30831" x="-0.7119059771351988" y="0.812840077874327" is_crease="false"><fold twin="30879" level="4"></vertex>
+  <vertex id="30833" x="-0.37388084264650767" y="50.12695136494669" is_crease="false"></vertex>
+  <vertex id="30835" x="-39.35628477705603" y="58.582523829078525" is_crease="false"></vertex>
+  <vertex id="30837" x="-41.21789783416804" y="50.0" is_crease="false"><fold twin="30907" level="2"></vertex>
+  <vertex id="30839" x="-0.8927147746200603" y="-0.009737618753263177" is_crease="false"><fold twin="30887" level="1"></vertex>
+</polygon>
+<polygon id="278" faceup="true" z="2">
+  <vertex id="30885" x="-0.37348268339620105" y="50.18503837557476" is_crease="false"><fold twin="30841" level="4"></vertex>
+  <vertex id="30887" x="-0.7119059771351998" y="0.8128400778741849" is_crease="false"><fold twin="30839" level="1"></vertex>
+  <vertex id="30889" x="-0.8927147746200319" y="-0.0097376187532916" is_crease="false"><fold twin="30851" level="2"></vertex>
+  <vertex id="30891" x="-41.02365777006496" y="49.759110959856" is_crease="false"></vertex>
+  <vertex id="30893" x="-39.012302067525695" y="58.7903377193894" is_crease="false"></vertex>
+</polygon>
+<polygon id="269" faceup="false" z="1">
+  <vertex id="30847" x="-0.7175410381250492" y="-0.009252708756079642" is_crease="false"><fold twin="30895" level="4"></vertex>
+  <vertex id="30849" x="-0.37485962473507883" y="49.984157933580704" is_crease="false"></vertex>
+  <vertex id="30851" x="-41.02365777006496" y="49.759110959856" is_crease="false"><fold twin="30889" level="2"></vertex>
+  <vertex id="30853" x="-0.8927147746200319" y="-0.0097376187532916" is_crease="false"><fold twin="30905" level="1"></vertex>
+</polygon>
+<polygon id="280" faceup="true" z="0">
+  <vertex id="30903" x="-0.37475103479008753" y="49.999999999999986" is_crease="false"><fold twin="30855" level="4"></vertex>
+  <vertex id="30905" x="-0.7175410381250489" y="-0.00925270875603701" is_crease="false"><fold twin="30853" level="1"></vertex>
+  <vertex id="30907" x="-0.8927147746200603" y="-0.009737618753263177" is_crease="false"><fold twin="30837" level="2"></vertex>
+  <vertex id="30909" x="-41.21789783416804" y="50.0" is_crease="false"></vertex>
+</polygon>
+<caption>six-way fold</caption>

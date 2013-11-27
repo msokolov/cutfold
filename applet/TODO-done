@@ -1,0 +1,18 @@
+* animate folds / unfolds
+* prevent folding after unfolding
+* add reset button
+* add folding guidelines
+* draw graph lines
+* auto-recenter after each fold/unfold/cut
+* extend fold lines to infinity
+* Don't Snap cut points to edge of polygon?
+This seems to be really annoying when there are obscured polygons that you
+snap to without even seeing them and it seems quite impossible to prevent
+that.  Perhaps it's enough to have introduced double-clicking?
+* save / restore / gallery
+** save to a named .xml file
+** make printable version (PDF / EPS)
+** make PNG version for gallery
+** applet "model" parameter can specify xml file to load
+** extend xml syntax to allow for guidelines
+** gallery shows all xml files in folder plus thumbnails if available

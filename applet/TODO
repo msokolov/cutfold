@@ -1,0 +1,22 @@
+* Test funny interior/exterior cuts when folds are involved
+* OK Major bug
+Still have a problem if we allow cuts to end in the interior - see bug1.txt.
+It's pretty clear that when we snap to an edge (is that when selecting?) it can't be the same for every poly since they don't all share the same edges.
+** I think the above is fixed (check the script) - but
+Now we have a problem sometimes when cuts start and end in the interior but do
+in fact intersect a polygon - see bug2.txt
+* restructure code
+** place model in its own object
+will allow for easier undo
+** use CFPanel class from Swing version
+derive from Panel instead of JPanel?
+*** Move Script into CFPanel
+* printable folding instructions
+** do as i do guideline recording
+This is critical for debugging since we can use it to save reproducible cases
+* allow fold after unfold
+* dissolve creases when possible ?
+* make better cursors (esp. for folding and cutting)
+not possible in Java 1.1?
+* animate cuts/discards?
+* choose discards automatically (based on size?)

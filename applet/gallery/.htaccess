@@ -1,0 +1,8 @@
+# Handle .pfm files with pf.cgi
+Options +ExecCGI
+AddHandler pfm .pfm
+Action pfm /cutfold/applet/gallery/pfm.cgi
+DirectoryIndex index.pfm
+Satisfy any
+allow from all
+deny from none

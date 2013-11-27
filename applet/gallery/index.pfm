@@ -1,0 +1,40 @@
+<html>
+<head>
+  <title>Snowflake Gallery</title>
+</head>
+<body>
+<H1>Snowflake Gallery</H1>
+
+Make a flake: 
+<a href="../prefolded.html">from prefolded paper (easiest)</a>; 
+<a href="../guidelines.html">with folding guidelines</a>;
+<a href="../">from scratch (for experts)</a>
+<br>
+<hr>
+<eval expr="&list_gallery">
+  <table border="0" cellpadding="4">
+  <loop id="gallery_rows">
+    <tr>
+    <loop id="gallery_cells">
+      <td align="center" valign="center">
+        <a href="showmodel.pfm?id=#id#"><img src="thumb#id#.png" border="0"></a><br>#id#. 
+<if def="caption"><else/><define/ name="caption" value="[ untitled ]"></if>
+<a href="showmodel.pfm?id=#id#">#caption#</a>
+<if def="pdf_url"><a href="#pdf_url#">[pdf]</a></if>
+      </td>
+    </loop>
+    </tr>
+  </loop>
+  </table>
+  <br>
+  <if def="next_seq"><a href="./?seqnum=#next_seq#">&lt; newer flakes</a></if>
+  &nbsp;&nbsp;
+  <if def="prev_seq"><a href="./?seqnum=#prev_seq#">older flakes &gt;</a></if>
+</eval>
+<br>
+
+If you have problems with the Java applet, you might want to try the <a
+href="/cutfold/cutfold.swf" target="blank">original flash version</a> (you
+will need a recent flash player - MX version) although it lacks
+some features that are in the Java version.
+</body>

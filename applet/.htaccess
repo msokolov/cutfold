@@ -1,0 +1,5 @@
+# turn off access control 
+Satisfy any
+allow from all
+deny from none
+Options +ExecCGI

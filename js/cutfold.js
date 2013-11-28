@@ -801,7 +801,7 @@ Cutfold.prototype.spin = function () {
     for (var i = 0; i<this.polys.length; i++) {
         this.polys[i].reflect (v, v1, this.zlevels);
     }
-    this,refresh (new Affine (v, v1));
+    this.refresh (new Affine (v, v1));
     this.rotation_style = 2;
 }
 

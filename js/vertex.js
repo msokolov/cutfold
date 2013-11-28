@@ -251,4 +251,3 @@ Vertex.prototype.string = function () {
         return "(" + Math.round(this.x) + "," + Math.round(this.y) + ")";
     }
 }
-

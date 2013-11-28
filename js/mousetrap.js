@@ -45,7 +45,7 @@ MouseTrap.prototype.handleMouseDown = function (evt, nclicks) {
             cutfold.localToGlobal (v);
             x = Math.round (v.x);
             y = Math.round (v.y);
-            this.redrawSegment (x, y);
+            this.cutfold.repaint ();
         }
     } else if (mode == "discard") {
         if (!cutfold.discardPolygon (x, y)) {
@@ -124,21 +124,26 @@ MouseTrap.prototype.handleMouseMove = function (evt) {
     this.move_y = y;
     var btn = evt.which;
     if (btn != 0 && cutfold.panel.getMode() == "folding") {
-        this.redrawSegment (x, y);
+        this.cutfold.repaint();
     }
     else if (cutfold.panel.getMode() == "cutting") {
-        this.redrawSegment (x, y);
+        this.cutfold.repaint();
     }
 }
 
 MouseTrap.prototype.draw = function (g) {
     // draw the current cursor state
-    var mode = cutfold.panel.getMode();
-    if (mode == "confirm fold" || mode == "folding") {
-        var g = cutfold.panel.getGraphics();
+    var mode = this.cutfold.panel.getMode();
+    if (mode == "confirm fold" || mode == "folding" || mode == "cutting") {
+        var g = this.cutfold.panel.getGraphics();
+        g.strokeStyle = "#000";
+        if (mode == "cutting") {
+            if (this.cutfold.pcut) {
+                this.drawPath (g, this.cutfold.pcut.points);
+            }
+        }
         //g.save();
         // g.globalCompositeOperation = "xor";
-        g.strokeStyle = "#000";
         g.moveTo (this.press_x, this.press_y);
         g.lineTo (this.move_x, this.move_y);
         g.stroke();
@@ -146,21 +151,17 @@ MouseTrap.prototype.draw = function (g) {
     }
 }
 
-MouseTrap.prototype.redrawSegment = function (x, y) {
-    /*
-    var g = cutfold.panel.getGraphics ();
-    g.save();
-    g.globalCompositeOperation = "xor";
-    g.strokeStyle = "#000";
-    g.moveTo (this.press_x, this.press_y);
-    g.lineTo (this.move_x, this.move_y);
-    this.move_x = x;
-    this.move_y = y;
-    g.moveTo (this.press_x, this.press_y);
-    g.lineTo (this.move_x, this.move_y);
+MouseTrap.prototype.drawPath = function (g, path) {
+    var v = path;
+    var u = v.copy();
+    this.cutfold.localToGlobal (u);
+    //console.debug ("draw " + u.string());
+    g.moveTo (u.x, u.y);
+    while ((v = v.next) && v != path) {
+        u.x = v.x; u.y = v.y;
+        this.cutfold.localToGlobal (u);
+        //console.debug ("draw " + u.string());
+        g.lineTo (u.x, u.y);
+    } 
     g.stroke();
-    g.restore();
-    */
-    this.cutfold.repaint ();
 }
-

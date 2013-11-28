@@ -303,7 +303,7 @@ Polygon.prototype.cut = function (pcut, new_polys, cut_folds) {
     /* In order to cut this polygon, pcut must enter and leave the polygon
      */
     start_inside = inside = this.encloses (pcut.points);
-    var xings = new Vector ();
+    var xings = [];
     // OK umm we really need to check whether any of the cutting polygon's 
     // edges intersect any of this polygon's edges.  Only if the cutting 
     // polygon is completely enclosed in this polygon do we need to 
@@ -367,7 +367,7 @@ Polygon.prototype.cut = function (pcut, new_polys, cut_folds) {
         // Check for intersections with this poly and any new polys 
         // created by cutting it with a previous edge of pcut.
         var vxings = this.intersect (v, null);
-        for (var i = 0; i < new_polys.size(); i++) {
+        for (var i = 0; i < new_polys.length; i++) {
             var q = new_polys[i];
             vxings = q.intersect (v, vxings);
         }

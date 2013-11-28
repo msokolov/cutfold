@@ -449,6 +449,8 @@ Cutfold.prototype.initCut = function (v) {
     var x = Math.round(v.x);
     var y = Math.round(v.y);
     g.rect (x-2, y-2, x+2, y+2);
+    g.stroke();
+    g.fill();
     return true;
 }
 
@@ -456,8 +458,9 @@ Cutfold.prototype.cutSelect = function (v, close_pcut) {
 
     var min_dist = 5;
     // check for intersections w/pcut, and if there is one then form
-    // a polygon and cut.
-    // this prevents people from making self-intersecting polygons
+    // a polygon and cut immediately.  We used to wait until the user
+    // double-clicked, but this way we prevent people from making
+    // self-intersecting polygons which cause all kinds of complication :)
     var u, ux = null, ex = null, start;
     u = this.pcut.points;
     while (u.next != null) {
@@ -542,7 +545,7 @@ Cutfold.prototype.cutSelect = function (v, close_pcut) {
     }
     var g = this.getGraphics();
     g.rect (v.x-2, v.y-2, v.x+2, v.y-2);
-    this.trace ("cutSelect return false");
+    console.debug  ("cutSelect return false");
     return false;           // continue selecting
 } 
 
@@ -555,20 +558,20 @@ Cutfold.prototype.cutModel = function () {
     this.polys_undo_copy = this.copyModel (); // save for undo
     this.enable_undo (true);
 
-    this.trace ("cutModel");
+    console.debug ("cutModel");
         
-    var npolys = this.polys.size();
+    var npolys = this.polys.length;
     this.pcut.computeBoundingBox ();
-    for (i = 0; i < this.npolys; i++) {
+    for (i = 0; i < npolys; i++) {
         var p = this.polys[i];
         if (! this.pcut.overlaps (p)) {
             // perform simple bounding box test to exclude some
             // polygons from the more expensive computations
-            this.trace ("pcut does not overlap poly " + p.id);
+            console.debug ("pcut does not overlap poly " + p.id);
             continue;
         }
-        this.trace ("cutting poly " + p.id);
-        p.cut (pcut, new_new_polys, cut_folds);
+        console.debug ("cutting poly " + p.id);
+        p.cut (this.pcut, new_new_polys, cut_folds);
         p.computeBoundingBox ();
         // don't try to cut the new_polys
         new_polys = new_polys.concat (new_new_polys);
@@ -620,7 +623,7 @@ Cutfold.prototype.copyModel = function () {
                     } while (v1 != v.fold.twin.v && v1 != q1.points);
                     // and link to it
                     if (v1 != v.fold.twin.v) {
-                        this.trace ("copyModel couldn't link up fold?");
+                        console.debug ("copyModel couldn't link up fold?");
                     } else {
                         u1.fold.twin = u.fold;
                         u.fold.twin = u1.fold;
@@ -863,16 +866,16 @@ Cutfold.prototype.checkModel = function (polys)
         do {
             if (u.fold != null) {
                 if (u.fold.v != u) {
-                    this.trace ("u.fold.v1 != u");
+                    console.debug ("u.fold.v1 != u");
                 }
                 if (u.fold.twin.twin != u.fold) {
-                    this.trace ("u.fold.twin.twin != u.fold");
+                    console.debug ("u.fold.twin.twin != u.fold");
                 }
                 if (u.fold.twin.v.poly.points == null) {
-                    this.trace ("u.fold.twin.v.poly.points (p.id=" + u.fold.twin.v.poly.id + ") is null");
+                    console.debug ("u.fold.twin.v.poly.points (p.id=" + u.fold.twin.v.poly.id + ") is null");
                 }
                 if (! u.fold.twin.v.eq (u.next)) {
-                    this.trace ("  ERROR fold.twin mismatch  ");
+                    console.debug ("  ERROR fold.twin mismatch  ");
                     this.drawDiamond (u, Color.blue);
                     this.drawDiamond (u.next, Color.black);
                     this.drawDiamond (u.fold.twin.v, Color.red);
@@ -880,7 +883,7 @@ Cutfold.prototype.checkModel = function (polys)
                 }
                 if (u.fold.twin == u.fold ||u.fold.twin.v.poly == u.poly)
                 {
-                    this.trace ("   ERROR fold is its own twin?");
+                    console.debug ("   ERROR fold is its own twin?");
                     //drawDiamond (u.fold.v1, cursor, 0x0000ff);
                     // drawDiamond (u.fold.v2, cursor, 0x0000ff);
                 }
@@ -890,28 +893,28 @@ Cutfold.prototype.checkModel = function (polys)
                 do {
                     vv = vv.next;
                     if (++count > 500) {
-                        this.trace ("checkModel inner loop: WARNING: poly has > 100 points? possible inf. loop detected");
+                        console.debug ("checkModel inner loop: WARNING: poly has > 100 points? possible inf. loop detected");
                         break;
                     }
                 }
                 while (vv != v && vv != p.points);
                 if (vv != v) {
-                    this.trace ("  ERROR vertex has orphaned twin");
+                    console.debug ("  ERROR vertex has orphaned twin");
                     this.drawDiamond (u, Color.blue);
                     this.drawDiamond (u.fold.twin.v, Color.red);
                 }
             }
             if (u.poly.id != p.id) {
-                this.trace ("  ERROR point poly id mismatch");
+                console.debug ("  ERROR point poly id mismatch");
             }
             u = u.next;
             if (++pcount > 500) {
-                this.trace ("checkModel inner loop: WARNING: poly has > 100 points? possible inf. loop detected");
+                console.debug ("checkModel inner loop: WARNING: poly has > 100 points? possible inf. loop detected");
                 break;
             }
         } while (u != p.points);
     }
-    this.trace ("checkModel found " + polys.size() + " polygons");
+    console.debug ("checkModel found " + polys.size() + " polygons");
 }
 
 Cutfold.prototype.getGraphics = function () {

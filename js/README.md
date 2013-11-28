@@ -7,6 +7,8 @@ canvas.
 The code is fairly similar, but here is list of the kinds of changes that were made when porting:
 
 * member variable access in prototypes must be qualified by "this."
+* overloaded functions are not available in JS - I renamed functions to give them unique names
+* Conversion from Vector to native JS arrays (.size to .length(), add() to push() etc)
 * canvas doesn't properly support XOR drawing mode, so drawing the folding cursor now requires a total redraw of the surface.  However this seems to perform well enough that it's not a problem.
 * canvas does double buffering for you, so that code was abandoned
 * eliminated my own js bubble sort for the native array.sort

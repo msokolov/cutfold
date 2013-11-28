@@ -692,12 +692,15 @@ Polygon.prototype.contains = function (v) {
     if (v.x < this.left || v.x > this.right || v.y < this.top || v.y > this.bottom) {
         return false;
     }
+    console.debug ("Polygon.contains  " + v.string());
     var vout = new Vertex (-200, -200);
     vout.next = v;
     var u = this.points;
     var intCount = 0;
     do { 
+        console.debug ("Polygon.contains test " + u.string());
         if (vout.intersectTest (u)) {
+            console.debug ("Polygon.contains intersect");
             ++intCount;
         }
         u = u.next;

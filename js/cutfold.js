@@ -21,7 +21,6 @@ function Cutfold(params) {
     this.tween_map = [];
     this.tween_map_has_dest = false;
 
-    this.trace = false;
     this.debug = false;
     this.params = params || {};
 
@@ -66,7 +65,6 @@ function Cutfold(params) {
 
 Cutfold.prototype.init = function (params) {
     this.debug = params['debug']
-    this.trace = params['trace']
     this.canvas = document.getElementById ("cutfold");
     this.setupCanvas (this.canvas);
     this.panel = new Panel (this, this.canvas, this.showguides, this.readonly);
@@ -320,13 +318,13 @@ Cutfold.prototype.foldModel = function (x1, y1, x2, y2) {
  */
  
 Cutfold.prototype.unfold_once = function () {
-    this.trace ("unfold,level=" + fold_level);
+    console.debug ("unfold,level=" + this.fold_level);
     if (this.fold_level <= 0) {
         return;
     }
 
     this.polys_tween_copy = this.polys_undo_copy = this.copyModel (); // save for undo and tweening
-    // trace ("copied polys");
+    // console.debug ("copied polys");
     this.enable_undo (true);
 
     // this depends on operating in stacking order because of the way we
@@ -396,7 +394,7 @@ Cutfold.prototype.unfold_once = function () {
       // remain as creases.  The one to remove must connect to the highest
       // numbered fold.  This ensures that creases ultimately connect to the exterior
       // and ensures that adjoining polygons will have congruent crease structures
-      // trace ("unfolding " + p.id);
+      // console.debug ("unfolding " + p.id);
       creases[i].fold.unfold ();
       }
       }
@@ -409,15 +407,15 @@ Cutfold.prototype.unfold_once = function () {
             creases[i].fold.twin.mark_creases ();
         }
     }
-    this.cullEmptyPolys (polys);
-    this.clearPolyFlags (polys);
+    this.cullEmptyPolys (this.polys);
+    this.clearPolyFlags (this.polys);
     -- this.fold_level;
     this.zlevels /= 2;
     this.refresh (axis);
 }
 
 Cutfold.prototype.cullEmptyPolys = function (polys) {
-    for (var i = 0; i < this.polys.size(); i++) {
+    for (var i = 0; i < this.polys.length; i++) {
         if (this.polys[i].points == null) {
             this.polys.splice (i, 1); /* remove the poly */
             --i;
@@ -431,7 +429,7 @@ Cutfold.prototype.initCut = function (v) {
     // TBD figure out if what it says just below is really true and 
     // maybe remove the following test:
 /*
-        for (int i=0; i<polys.size(); i++) {
+        for (int i=0; i<polys.length; i++) {
             // only allow cuts to start outside the paper.  This avoids
             // a buggy situation I think.  If you start and end inside the
             // poly and the edge connecting your first and last points 
@@ -498,14 +496,14 @@ Cutfold.prototype.cutSelect = function (v, close_pcut) {
           v = u;
           }
         */
-        this.trace ("cutSelect return true");
+        console.debug ("cutSelect return true");
         return true;
     }
 
     // end this cut if we are outside all polygons and we started
     // cutting outside all polygons
-    //trace ("findPolygon (pcut.points)=" + findPolygon (pcut.points));
-    //trace ("findPolygon (v)=" + findPolygon (v));
+    //console.debug ("findPolygon (pcut.points)=" + findPolygon (pcut.points));
+    //console.debug ("findPolygon (v)=" + findPolygon (v));
     if (this.findPolygon (u) == null && this.findPolygon (v) == null) {
         close_pcut = true;
         v.next = this.pcut.points;
@@ -644,13 +642,6 @@ Cutfold.prototype.copyModel = function () {
  * polygon selection
  */
 
-Cutfold.prototype.findPolygon = function (x, y) {
-    // x,y in screen coordinates
-    var v = new Vertex (x, y);
-    this.globalToLocal (v);
-    return this.findPolygon (v);
-}
-
 Cutfold.prototype.findPolygon = function (v) {
     // v in model coordinates
     for (var i = this.polys.length - 1; i >= 0; i--) {
@@ -662,20 +653,21 @@ Cutfold.prototype.findPolygon = function (v) {
     return null;
 }
 
-Cutfold.prototype.discardPolygon = function (x, y) {
+Cutfold.prototype.discardPolygon = function (v) {
     var p;
     var found = false;
+    console.debug ("discard " + v.string());
     var pcopy = this.copyModel (); // save for undo
-    while ((p = this.findPolygon (x, y)) != null)
+    while ((p = this.findPolygon (v)) != null)
     {
-        // System.out.println ("discard found poly " + p.id);
+        console.debug ("discard found poly " + p.id);
         p.markPolyGraph (true, null, -1); // set the flipme flag
-        for (var i = 0; i < this.polys.size(); i++)
+        for (var i = 0; i < this.polys.length; i++)
         {
             var q = this.polys[i];
             if (q.flipme) {
                 // System.out.println ("discard removing poly " + q.id);
-                polys.splice (i, 1);
+                this.polys.splice (i, 1);
                 --i;
                 found = true;
             }
@@ -858,7 +850,7 @@ Cutfold.prototype.postURL = function () {}
 
 Cutfold.prototype.checkModel = function (polys) 
 {
-    // trace ("ENTER checkModel");
+    // console.debug ("ENTER checkModel");
     for (var i = 0; i<polys.length; i++) {
         var pcount = 0;
         var p = this.polys[i];
@@ -914,7 +906,7 @@ Cutfold.prototype.checkModel = function (polys)
             }
         } while (u != p.points);
     }
-    console.debug ("checkModel found " + polys.size() + " polygons");
+    console.debug ("checkModel found " + polys.length + " polygons");
 }
 
 Cutfold.prototype.getGraphics = function () {
@@ -933,12 +925,6 @@ Cutfold.prototype.drawDiamond = function (v, c)
 
 Cutfold.prototype.enable_undo = function (b) {
     this.panel.enable_undo (b);
-}
-
-Cutfold.prototype.trace = function (msg) {
-    if (tracing) {
-        console.debug (msg);
-    }
 }
 
 Cutfold.prototype.getPoly = function (i) {

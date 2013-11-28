@@ -117,7 +117,7 @@ Fold.prototype.unfold = function () {
     } while (e != e1p);
 }
 
-Polygon.prototype.mark_creases = function () {
+Fold.prototype.mark_creases = function () {
     // All the edges that are part of this fold level are now creases
     var e = this.v;
     do {
@@ -130,7 +130,7 @@ Polygon.prototype.mark_creases = function () {
     this.level = 0;
 }
 
-Polygon.prototype.pushCutFoldPoint = function (v, cutfolds) {
+Fold.prototype.pushCutFoldPoint = function (v, cutfolds) {
     if (this.cutpoints == null) {
         this.cutpoints = []
         if (cutfolds != null) {
@@ -141,19 +141,19 @@ Polygon.prototype.pushCutFoldPoint = function (v, cutfolds) {
 }
 
 /* patchCut matches up newly created folds that have been created by cutting. */
-Polygon.prototype.patchCut = function () {
+Fold.prototype.patchCut = function () {
     while (this.cutpoints.length > 0) {
         var v0 = this.cutpoints.pop();
         var v1;
         if (this.twin.v.eq (v0.next)) {
             // the start point of the original uncut folded edge f1
             // is added implicitly
-            v1 = twin.v;
+            v1 = this.twin.v;
         } else {
             // search for the matching point in f1's cutpoints
             var i; 
             v1 = null;
-            for (i=0; i<this.twin.cutpoints.size(); i++) {
+            for (i=0; i<this.twin.cutpoints.length; i++) {
                 v1 = this.twin.cutpoints[i];
                 if (v1.eq(v0.next)) {
                     this.twin.cutpoints.splice (i, 1);
@@ -163,19 +163,19 @@ Polygon.prototype.patchCut = function () {
         }
         this.addCutFold (v0, v1);
     }
-    if (this.twin.cutpoints.size() > 0) {
+    if (this.twin.cutpoints.length > 0) {
         // the start point of the original uncut folded edge f 
         // is added implicitly   
         var v1 = this.twin.cutpoints.shift();
-        this.addCutFold (v, v1);
+        this.addCutFold (this.v, v1);
     }
 }
 
-Polygon.prototype.addCutFold = function (v1, v2) {
-    var ff1 = new Fold (v1, level, index);
+Fold.prototype.addCutFold = function (v1, v2) {
+    var ff1 = new Fold (v1, this.level, this.index);
     v1.fold = ff1;
 
-    var ff2 = new Fold (v2, twin.level, twin.index);
+    var ff2 = new Fold (v2, this.twin.level, this.twin.index);
     v2.fold = ff2;
 
     ff1.twin = ff2;

@@ -48,7 +48,9 @@ MouseTrap.prototype.handleMouseDown = function (evt, nclicks) {
             this.cutfold.repaint ();
         }
     } else if (mode == "discard") {
-        if (!cutfold.discardPolygon (x, y)) {
+        var v = new Vertex (x, y);
+        cutfold.globalToLocal (v);
+        if (!cutfold.discardPolygon (v)) {
             // leave discard mode when you click in the bg
             panel.setMode ( "" );
         }

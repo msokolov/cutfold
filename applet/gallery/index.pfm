@@ -33,8 +33,7 @@ Make a flake:
 </eval>
 <br>
 
-If you have problems with the Java applet, you might want to try the <a
-href="/cutfold/cutfold.swf" target="blank">original flash version</a> (you
-will need a recent flash player - MX version) although it lacks
-some features that are in the Java version.
+If you have problems with the Java applet, you might want to try the 
+<a href="/cutfold/js">new Javascript HTML5 Canvas</a> version, or maybe the 
+<a href="/cutfold/cutfold.swf" target="blank">original flash version</a>.
 </body>

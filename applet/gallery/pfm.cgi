@@ -8,7 +8,7 @@ use CGI qw/-oldstyle_urls/;
 
 MAIN: 
 {
-    my $query = new CGI;
+    my ($query) = new CGI;
     my $pfmfile;                # some web servers screw this up
     if ($query->path_translated())
     {
@@ -42,9 +42,9 @@ sub list_gallery
     my ($htm) = @_;
     my $maxseq = 0;
     if (open (SEQUENCE, "sequence")) {
-	$maxseq = <SEQUENCE>;
-	close SEQUENCE;
-	$maxseq = int ($maxseq);
+        $maxseq = <SEQUENCE>;
+        close SEQUENCE;
+        $maxseq = int ($maxseq);
     }
 
     my $seqnum;

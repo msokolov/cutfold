@@ -41,7 +41,7 @@ function Polygon (p) {
         this.id = Polygon.next_id++;
         this.z = 0;
         this.faceup = true;
-        this.fgcolor = Polygon.colors[id%10];
+        this.fgcolor = Polygon.colors[this.id%10];
 
         // These three flags are used to keep track of which polygons are to be
         // flipped when folding - we might combine them into a bit field...
@@ -895,7 +895,7 @@ Polygon.prototype.string = function () {
     do {
         s += u.string();
         u = u.next;
-    } while (u != this.points);
+    } while (u && u != this.points);
     s += "]";
     return s;
 }

@@ -37,7 +37,7 @@ Vertex.prototype.xml = function () {
         "\" y=\"" + this.y + "\" is_crease=\"" + this.is_crease + "\">";
     if (this.fold != null) {
         xml += "<fold twin=\"" + this.fold.twin.v.id + "\" level=\"" + 
-            this.fold.level + "\" index=\"" + this.fold.index + "\">";
+            this.fold.level + "\" index=\"" + this.fold.index + "\"/>";
     }
     xml += "</vertex>";
     return xml;

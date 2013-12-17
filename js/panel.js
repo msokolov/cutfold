@@ -105,7 +105,7 @@ Panel.prototype.paint = function () {
     var w = this.canvas.width;
     var h = this.canvas.height;
     var og = this.getOSGraphics(w, h);
-    //console.debug ("panel.paint, cutfold.scale=" + this.cutfold.scale);
+    // console.debug ("panel.paint, cutfold.scale=" + this.cutfold.scale);
     og.fillStyle = "#ffffd7";
     og.rect (0, 0, w, h);
     this.drawGrid (og, w, h);

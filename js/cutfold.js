@@ -8,9 +8,9 @@
 
 var cutfold;
 
-function init() {
-    cutfold = new Cutfold();
-    cutfold.init({});
+function init(params) {
+    cutfold = new Cutfold(params);
+    cutfold.init();
 }
 
 function Cutfold(params) {
@@ -63,15 +63,16 @@ function Cutfold(params) {
 
 }
 
-Cutfold.prototype.init = function (params) {
-    this.debug = params['debug']
+Cutfold.prototype.init = function () {
+    console.debug ('params.model=' + this.params.model);
+    this.debug = this.params.debug;
     this.canvas = document.getElementById ("cutfold");
     this.setupCanvas (this.canvas);
     this.panel = new Panel (this, this.canvas, this.showguides, this.readonly);
 
     // TODO: implement these as classes on the canvas specified in markup
-    // params['showGuidelines']
-    // params['readonly']
+    // params.showGuidelines
+    // params.readonly
 
     this.reset ();
 }
@@ -95,14 +96,19 @@ Cutfold.prototype.rescale_canvas = function (canvas, delay, repaint) {
     // get the w,h of the paper model
     var w = this.right - this.left;
     var h = this.bottom - this.top;
-    // console.debug ("rescale_canvas: (" + w + "," + h +")");
+    if (w == 0 || h == 0) {
+        return;
+    }
+    console.debug ("rescale_canvas: (" + canvas + "," + w + "," + h +")");
     /*
     var left = canvas.offsetLeft;
     var top = canvas.offsetTop;
     */
+    console.debug (this.left + this.right);
     var cx = (this.left + this.right) / 2;
     var cy = (this.bottom + this.top) / 2;
     this.scale_target = w > h ? (400 / w) : (400 / h);
+    console.debug (this.left + "," + this.right + ": " + cx);
     this.xoff_target = Math.floor(canvas.width/2 - Math.round(cx * this.scale_target));
     this.yoff_target = Math.floor(canvas.height/2 - Math.round(cy * this.scale_target));
     this.scale_start = this.scale;
@@ -112,8 +118,8 @@ Cutfold.prototype.rescale_canvas = function (canvas, delay, repaint) {
     // space by (x,y)*scale + (xpos, ypos)
     this.scale_timer = new Date().getTime();
     this.scale_time = delay;
-    //System.out.println ("xoff="+xoff+", yoff="+yoff+" scale="+scale);
-    //System.out.println ("target xoff="+xoff_target+", yoff="+yoff_target+" scale="+scale_target);
+    console.debug ("xoff="+this.xoff+", yoff="+this.yoff+" scale="+this.scale);
+    console.debug ("target xoff="+this.xoff_target+", yoff="+this.yoff_target+" scale="+this.scale_target);
     if (repaint) { 
         this.repaint ();
     }
@@ -143,14 +149,14 @@ Cutfold.prototype.reset = function () {
     this.fold_index_copy = 0;
 
     if (this.debug) {
-        script_path = params["script"];
+        script_path = this.params.script;
         // console.debug ("script=" + script_path);
         if (script_path != null) {
             // TODO - Scripting
             // script = new Script (script_path);
         }
     }
-    var model_path = this.params["model"];
+    var model_path = this.params.model;
     console.debug ("model=" + model_path);
     if (model_path) {
         this.load_model (model_path);
@@ -837,6 +843,7 @@ Cutfold.prototype.getModelBounds = function (descend) {
         if (p.top < this.top) this.top = p.top;
         if (p.bottom > this.bottom) this.bottom = p.bottom;
     }
+    console.debug ("getModelBounds " + this.top + "," + this.left + ":" + this.bottom + "," + this.right);
 }
 
 Cutfold.prototype.print = function () {
@@ -845,9 +852,6 @@ Cutfold.prototype.print = function () {
     }
 }
 
-// TODO: post XML form to URL
-Cutfold.prototype.postURL = function () {}
-
 Cutfold.prototype.checkModel = function (polys) 
 {
     // console.debug ("ENTER checkModel");
@@ -855,6 +859,8 @@ Cutfold.prototype.checkModel = function (polys)
         var pcount = 0;
         var p = this.polys[i];
         var u = p.points;
+        // console.debug ("checkModel " + i);
+        // console.debug (p.string());
         do {
             if (u.fold != null) {
                 if (u.fold.v != u) {
@@ -931,6 +937,134 @@ Cutfold.prototype.getPoly = function (i) {
     return this.polys[i];
 }
     
-// TODO: read model from URL
-Cutfold.prototype.load_model = function (model_path) { }
+function htmlEscape(str) {
+    return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;');
+}
 
+Cutfold.prototype.postURL = function ()  {
+    var caption = document.getElementById("caption");
+    if (! caption) {
+        console.error ("missing caption element");
+        return;
+    }
+    if (!caption.value) {
+        this.panel.setHelpText ("Please enter a title for your flake.");
+        return;
+    }
+    var xml = "<cutfold.model>";
+    for (var i =0; i < this.polys.length; i++) {
+        xml += this.getPoly(i).xml() + "\n";
+    }
+    // TBD - should HTML encode the caption...
+    xml += "<caption>" + htmlEscape(caption.value) + "</caption>\n";
+    xml += "</cutfold.model>";
+    var myurl = location.href;
+    var url = myurl.substring (0, myurl.lastIndexOf('/')+1);
+    url = url + "save.cgi"
+    invoke_request ("POST", url, Cutfold.postCallback, xml);
+}
+
+Cutfold.postCallback = function () {
+    location.href += "gallery/";
+}
+
+// TODO: read model from URL
+Cutfold.prototype.load_model = function (model_path) { 
+    get_request (model_path, Cutfold.onLoadModel, this);
+}
+
+Cutfold.onLoadModel = function (xmlhttp, cutfold) {
+    var xml = xmlhttp.responseXML;
+    var vertex_map = {};
+    var fold_level = 0, fold_index = 0;
+    var polyNodes = xml.getElementsByTagName ("polygon");
+    // console.debug ("got " + polyNodes.length + " polygons");
+    for (var i = 0; i < polyNodes.length; i++) {
+        var pnode = polyNodes.item(i);
+        // console.debug ("poly " + i + ": " + pnode + " " + pnode.getAttribute("id"));
+        var p = new Polygon ();
+        p.id = parseInt(pnode.getAttribute("id"));
+        p.z = parseInt(pnode.getAttribute("z"));
+        p.faceup = (pnode.getAttribute("faceup") == "true");
+        var nodes = pnode.childNodes;
+        var lastv = null;
+        for (var j = 0; j < nodes.length; j++) {
+            var node = nodes.item (j);
+            if (node.nodeName == "vertex") {
+                var v = new Vertex (parseFloat(node.getAttribute("x")), 
+                                    parseFloat(node.getAttribute("y") + 0));
+                v.is_crease = node.getAttribute("is_crease") == "true";
+                v.id = parseInt(node.getAttribute("id"));
+                v.poly = p;
+                if (! lastv) {
+                    p.points = v;
+                } else {
+                    lastv.next = v;
+                }
+                lastv = v;
+                vertex_map[v.id] = v;
+                var vnodes = node.childNodes;
+                for (var k = 0; k < vnodes.length; k++) {
+                    var vnode = vnodes.item(k);
+                    if (vnode.nodeName == "fold") {
+                        var f = new Fold (v, parseInt(vnode.getAttribute("level")), parseInt(vnode.getAttribute("index")));
+                        v.fold = f;
+                        var twin  = parseInt(vnode.getAttribute("twin"));
+                        var u = vertex_map[twin];
+                        if (u) {
+                            // console.debug ("twins: " + v.id + "," + twin);
+                            f.twin = u.fold;
+                            u.fold.twin = f;
+                        } else {
+                            // console.debug ("no twin for " + v.id);
+                        }
+                        if (f.level > fold_level) {
+                            fold_level = f.level;
+                        }
+                        if (f.index > fold_index) {
+                            fold_index = f.index;
+                        }
+                    }
+                }
+            }
+        }
+        lastv.next = p.points; // close the loop
+        cutfold.polys.push (p);
+        //console.debug (p.string());
+    }
+    // renumber polygons - make sure next_id doesn't overlap an existing
+    // polygon!
+    for (var i =0; i < cutfold.polys.length; i++) {
+        cutfold.getPoly(i).id = i;
+    }
+    console.debug ("loaded " + cutfold.polys.length + " polys");
+    Polygon.next_id = cutfold.polys.length;
+    cutfold.zlevels = 1 << fold_level;
+
+    cutfold.checkModel (cutfold.polys);
+    cutfold.scale = 1.0;
+    cutfold.refresh(null);
+}
+
+/**
+* Provides requestAnimationFrame in a cross browser way.
+* @author paulirish / http://paulirish.com/
+*/
+ 
+if ( !window.requestAnimationFrame ) {
+    window.requestAnimationFrame = ( function() {
+ 
+        return window.webkitRequestAnimationFrame ||
+            window.mozRequestAnimationFrame ||
+            window.oRequestAnimationFrame ||
+            window.msRequestAnimationFrame ||
+            function( /* function FrameRequestCallback */ callback, /* DOMElement Element */ element ) {
+                window.setTimeout( callback, 1000 / 60 );
+            };
+    } )();
+}

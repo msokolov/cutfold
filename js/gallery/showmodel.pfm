@@ -1,23 +1,26 @@
 <!DOCTYPE html>
+<eval expr="&showmodel">
 <html>
   <head>
-    <title>cutfold</title>
+    <title>Snowflake #ID#</title>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8"></meta>
-    <link rel="stylesheet" type="text/css" href="styles.css"></link>
-    <script src="vertex.js"></script>
-    <script src="polygon.js"></script>
-    <script src="mousetrap.js"></script>
-    <script src="panel.js"></script>
-    <script src="cutfold.js"></script>
-    <script src="intersection.js"></script>
-    <script src="fold.js"></script>
-    <script src="affine.js"></script>
-    <script src="xmlhttp.js"></script>
+    <link rel="stylesheet" type="text/css" href="../styles.css"></link>
+    <script src="../vertex.js"></script>
+    <script src="../polygon.js"></script>
+    <script src="../mousetrap.js"></script>
+    <script src="../panel.js"></script>
+    <script src="../cutfold.js"></script>
+    <script src="../intersection.js"></script>
+    <script src="../fold.js"></script>
+    <script src="../affine.js"></script>
+    <script src="../xmlhttp.js"></script>
+  </head>
+  <body onload="init({'model':'model#ID#.xml'})">
+    <h1>#CAPTION#</h1> (snowflake #id#)
+    <hr />
     <!--
         <script src="test.js"></script>
     -->
-  </head>
-  <body onload="init()">
     <h1>cutfold</h1>
     <canvas id="cutfold" width="500" height="500">
       <!-- note this width defines the canvas coordinates, but the width in
@@ -40,3 +43,4 @@
     </div>
   </body>
 </html>
+</eval>

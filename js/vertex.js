@@ -48,21 +48,21 @@ Vertex.prototype.xml = function () {
 }
 
 Vertex.prototype.findPrev = function () {
-    // find the Vertex prior to this one in its polygon's
-    // one-way linked list of vertices
-    var u = this.poly.points;
-    while (u.next != this) {
-        u = u.next;
-    }
-    return u;
+  // find the Vertex prior to this one in its polygon's
+  // one-way linked list of vertices
+  //var u = this.poly.points;
+  var u = this.next;
+  while (u.next != this) {
+    u = u.next;
+  }
+  return u;
 }
 
 Vertex.prototype.join = function (other) {
     // Join two edges together by eliminating redundant points
     // It is assumed here that other.eq(next)
     if (! other.eq(next)) {
-        console.error ("ERROR: attempt to join distal vertices");
-        return;
+        throw new Error("attempt to join distal vertices");
     }
     if (this.parallel (other)) {
         // In the case where the two edges are also parallel 
@@ -101,20 +101,31 @@ Vertex.prototype.distanceSquared = function (v) {
     return dx*dx + dy*dy;
 }
 
+/*
+ * true if the coordinates are within .0001
+ * TODO: rename 'near'
+ */
 Vertex.prototype.eq = function (v) {
     return (Math.abs (v.x-this.x) < 0.0001 &&
             Math.abs (v.y-this.y) < 0.0001);
 }
 
+/*
+ * Can we eliminate this? it will be a source of numerical instability OTOH it may be safe if we
+ * only use it in join and are conservative, biased on the side of !parallel since that will just
+ * prevent us from collapsing points?
+ */
 Vertex.prototype.parallel = function (v) {
-    var x = this.x;
-    var y = this.y;
-    var next = this.next;
-    if (Math.abs(next.x - x) < 0.01) {
-        return Math.abs(v.next.x - v.x) < 0.01;
-    }
-    var ratio = (next.x - x) / (v.next.x - v.x);
-    return Math.abs ((v.next.y - v.y) * ratio - (next.y - y)) < 0.01;
+  var x = this.x;
+  var y = this.y;
+  var next = this.next;
+  if (Math.abs(v.next.x - v.x) < 0.00001 || Math.abs(next.x - x) < 0.00001) {
+    // avoid div/0
+    return false;
+  }
+  var tan = (next.y - y) / (next.x - x);
+  var vtan = (v.next.y - v.y) / (v.next.x - v.x);
+  return Math.abs(tan - vtan) < 0.01;
 }
 
 Vertex.prototype.intersectEdges = function (u1, treturn) {

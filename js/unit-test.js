@@ -2,15 +2,65 @@
   Cutfold unit test framework
 */
 
+function assert(cond, message) {
+  if (!cond) {
+    throw new Error(message);
+  }
+}
+
+function assert_equals(a, b, message) {
+  if (a != b) {
+    if (message) {
+      throw new Error(`${a} != ${b}: ${message}`);
+    } else {
+      throw new Error(`${a} != ${b}`);
+    }
+  }
+}
+
 var UT = {
 
+  /** Unit Tests are consided "passing" if they do not throw an exception. Any return value is ignored. */
   tests: {
-    /** Unit Tests are consided "passing" if they do not throw an exception. Any return value is ignored. */
-    hello_world: function () {
+
+    hello_world: function() {
+      /* always pass; tests the unit testing framework */
     },
-    fail: function () {
+
+    fail: function() {
+      /* always fail; tests the unit testing framework */
       throw new Error("embrace failure");
+    },
+
+    /* Vertex tests */
+    Vertex_create: function() {
+      var v = new Vertex(100, 200);
+      assert_equals(v.id, Vertex.next_id - 1);
+      assert(v.x == 100);
+      assert(v.y == 200);
+      assert(v.next == null);
+      assert(!v.is_crease);
+      assert(v.fold == null);
+      assert(v.poly == null);
+    },
+
+    Vertex_copy: function() {
+      var v = new Vertex(100, 200);
+      v.next = 1;
+      v.fold = 1;
+      v.poly = 1;
+      v.is_crease = true;
+      v1 = v.copy();
+      // these attributes are copied
+      assert_equals(v1.x, v.x);
+      assert_equals(v1.y, v.y);
+      assert(v1.is_crease);
+      // these are not
+      assert_equals(v1.next, null);
+      assert(v1.fold == null);
+      assert(v1.poly == null);
     }
+
   },
 
   run_all_tests: function() {
@@ -38,7 +88,13 @@ var UT = {
       }
       test_function();
     } catch (ex) {
-      UT.fail(test_target, ex.message);
+      if (ex.message) {
+        UT.fail(test_target, ex.message);
+      } else {
+        var stack = ex.stack;
+        var stack_index = window.chrome ? 2 : 1;
+        UT.fail(test_target, stack.split('\n')[stack_index]);
+      }
       return;
     }
     UT.ok(test_target);

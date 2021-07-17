@@ -10,14 +10,18 @@
  */
 
 function Vertex (x, y, v) {
-    id = Vertex.next_id++;
-    this.x = x;
-    this.y = y;
-    this.next = v;
-    // a crease is a line segment drawn across a polygon, effectively cutting it in two
-    this.is_crease = false;
-    this.fold = null;
-    this.poly = null;
+  this.id = Vertex.next_id++;
+  this.x = x;
+  this.y = y;
+  this.next = v;
+  // a crease is a line segment drawn across a polygon, effectively cutting it in two
+  this.is_crease = false;
+  // a Fold is an edge (a, b) that lies on a fold; it marks where a polygon was created by folding
+  // an ancestral polygon Each Fold is associated with the "a" vertex, and the a vertex with that
+  // Fold.
+  this.fold = null;
+  // The Polygon of which this Vertex is a part.
+  this.poly = null;
 }
 
 Vertex.next_id = 1

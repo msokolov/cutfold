@@ -1,9 +1,10 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>cutfold</title>
+    <title>cutfold Unit Tests</title>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8"></meta>
     <link rel="stylesheet" type="text/css" href="styles.css"></link>
+    <!-- application code -->
     <script src="vertex.js"></script>
     <script src="polygon.js"></script>
     <script src="mousetrap.js"></script>
@@ -13,13 +14,19 @@
     <script src="fold.js"></script>
     <script src="affine.js"></script>
     <script src="xmlhttp.js"></script>
-    <!-- uncomment to override some handlers with debug version that print to console -->
-    <!--
-        <script src="debug.js"></script>
-    -->
+
+    <!-- test framework -->
+    <script src="unit-test.js"></script>
+    <link rel="stylesheet" type="text/css" href="test-styles.css"></link>
+    
   </head>
-  <body onload="init()">
-    <h1>cutfold</h1>
+  <body>
+    <h1>cutfold Unit Tests</h1>
+    <input type="button" onclick="UT.run_all_tests();" value="run all tests"></input>
+    <ul id="unit-tests">
+      <li name="hello_world" onclick="UT.click(event);">Hello World:</li>
+      <li name="fail" onclick="UT.click(event);">Failure test:</li>
+    </ul>
     <canvas id="cutfold" width="500" height="500">
       <!-- note this width defines the canvas coordinates, but the width in
            css controls the actual display width. We probably want them to

@@ -1,0 +1,22 @@
+#unit-tests {
+    padding-inline-start: 0;
+}
+
+#unit-tests li {
+    padding: 2px;
+    border: 1px solid gray;
+    list-style-type: none;
+    font-family: mono, courier
+}
+
+#unit-tests .ut-ok {
+    padding-left: 1em;
+    color: green;
+    float: right;
+}
+
+#unit-tests .ut-fail {
+    padding-left: 1em;
+    color: red;
+    float: right;
+}

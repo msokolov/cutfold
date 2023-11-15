@@ -132,9 +132,9 @@ var UT = {
 
     Vertex_eq: function() {
       var v = new Vertex(1, 2);
-      assert(v.eq(v));
-      assert(v.eq(new Vertex(1.001, 2)) == false);
-      assert(v.eq(new Vertex(1.00001, 2)));
+      assert(v.near(v));
+      assert(v.near(new Vertex(1.001, 2)) == false);
+      assert(v.near(new Vertex(1.00001, 2)));
     },
 
     Vertex_parallel: function() {

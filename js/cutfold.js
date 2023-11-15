@@ -872,7 +872,7 @@ Cutfold.prototype.checkModel = function (polys)
                 if (u.fold.twin.v.poly.points == null) {
                     console.debug ("u.fold.twin.v.poly.points (p.id=" + u.fold.twin.v.poly.id + ") is null");
                 }
-                if (! u.fold.twin.v.eq (u.next)) {
+                if (! u.fold.twin.v.near (u.next)) {
                     console.debug ("  ERROR fold.twin mismatch  ");
                     this.drawDiamond (u, Color.blue);
                     this.drawDiamond (u.next, Color.black);

@@ -148,7 +148,7 @@ Fold.prototype.patchCut = function () {
     while (this.cutpoints.length > 0) {
         var v0 = this.cutpoints.pop();
         var v1;
-        if (this.twin.v.eq (v0.next)) {
+        if (this.twin.v.near(v0.next)) {
             // the start point of the original uncut folded edge f1
             // is added implicitly
             v1 = this.twin.v;
@@ -158,7 +158,7 @@ Fold.prototype.patchCut = function () {
             v1 = null;
             for (i=0; i<this.twin.cutpoints.length; i++) {
                 v1 = this.twin.cutpoints[i];
-                if (v1.eq(v0.next)) {
+                if (v1.near(v0.next)) {
                     this.twin.cutpoints.splice (i, 1);
                     break;
                 }

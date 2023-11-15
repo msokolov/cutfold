@@ -61,8 +61,8 @@ Vertex.prototype.findPrev = function () {
 // This method is only called by Fold.unfold, which is currently unused
 Vertex.prototype.join = function (other) {
     // Join two edges together by eliminating redundant points
-    // It is assumed here that other.eq(this.next)
-    if (! other.eq(this.next)) {
+    // It is assumed here that other.near(this.next)
+    if (! other.near(this.next)) {
         throw new Error("attempt to join distal vertices");
     }
     if (this.parallel(other)) {
@@ -104,9 +104,8 @@ Vertex.prototype.distanceSquared = function (v) {
 
 /*
  * true if the coordinates are within .0001
- * TODO: rename 'near'
  */
-Vertex.prototype.eq = function (v) {
+Vertex.prototype.near = function (v) {
     return (Math.abs (v.x-this.x) < 0.0001 &&
             Math.abs (v.y-this.y) < 0.0001);
 }

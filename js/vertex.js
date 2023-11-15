@@ -58,13 +58,14 @@ Vertex.prototype.findPrev = function () {
   return u;
 }
 
+// This method is only called by Fold.unfold, which is currently unused
 Vertex.prototype.join = function (other) {
     // Join two edges together by eliminating redundant points
-    // It is assumed here that other.eq(next)
-    if (! other.eq(next)) {
+    // It is assumed here that other.eq(this.next)
+    if (! other.eq(this.next)) {
         throw new Error("attempt to join distal vertices");
     }
-    if (this.parallel (other)) {
+    if (this.parallel(other)) {
         // In the case where the two edges are also parallel 
         // (thus colinear, since they share a point), then we can eliminate two edges
         // and we also need to patch up the fold structure
@@ -144,6 +145,7 @@ Vertex.prototype.intersectEdges = function (u1, treturn) {
 
     if (! Vertex.rectOverlap (v1, v2, u1, u2)) {
         // quick bounding box test
+      console.log("no overlap");
         return null;
     }
 
@@ -152,6 +154,7 @@ Vertex.prototype.intersectEdges = function (u1, treturn) {
     var x21 = v2.x - v1.x;
     var y21 = v2.y - v1.y;
     var denom = y43*x21 - x43*y21;
+    // console.log(denom);
     if (Math.abs(denom) < 0.01) {
         return null;  // line segments are parallel
     }

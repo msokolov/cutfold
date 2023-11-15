@@ -18,10 +18,30 @@ function assert_equals(a, b, message) {
   }
 }
 
-function ut_rotate(x, y, radians) {
+function assert_near(a, b, message) {
+  const EPSILON = 1e-9;
+  if (Math.abs(a - b) > EPSILON) {
+    if (message) {
+      throw new Error(`${a} !~ ${b}: ${message}`);
+    } else {
+      throw new Error(`${a} !~ ${b}`);
+    }
+  }
+}
+
+function ut_rotate_cw(x, y, radians) {
   var sin = Math.sin(radians);
   var cos = Math.cos(radians);
   return [x*cos + y*sin, y*cos - x*sin];
+}
+
+function ut_order_rect(r) {
+  var or = [[0, 0],[0, 0]];
+  or[0][0] = Math.min(r[0][0], r[1][0]);
+  or[1][0] = Math.max(r[0][0], r[1][0]);
+  or[0][1] = Math.min(r[0][1], r[1][1]);
+  or[1][1] = Math.max(r[0][1], r[1][1]);
+  return or;
 }
 
 var UT = {
@@ -101,10 +121,6 @@ var UT = {
       assert_equals(v1, v2.findPrev());
     },
 
-    // TODO: test Vertex.join. It is kind of tricky
-    Vertex_join: function() {
-    },
-
     Vertex_d2: function() {
       var v = new Vertex(1, 2);
       assert_equals(v.distanceSquared(v), 0);
@@ -173,9 +189,9 @@ var UT = {
       // Now rotate some random amount
       for (var i = 0; i < 10; i ++) {
         var radians = Math.random() - 0.5;
-        var xy = ut_rotate(v1.x, v1.y, radians);
+        var xy = ut_rotate_cw(v1.x, v1.y, radians);
         var vr = new Vertex(xy[0], xy[1]);
-        xy = ut_rotate(v1.next.x, v1.next.y, radians);
+        xy = ut_rotate_cw(v1.next.x, v1.next.y, radians);
         vr.next = new Vertex(xy[0], xy[1]);
         // This is squdgy, it will probably fail
         if (Math.abs(radians) < 0.001) {
@@ -187,10 +203,71 @@ var UT = {
       }
     },
 
-    Vertex_intersectTest: function() {
+    Vertex_rectOverlap: function() {
+      var r1 = [[Math.random(), Math.random()], [Math.random(), Math.random()]];
+      var r2 = [[Math.random(), Math.random()], [Math.random(), Math.random()]];
+      var or1 = ut_order_rect(r1), or2 = ut_order_rect(r2);
+      var overlaps = or1[1][0] > or2[0][0] && or1[0][0] < or2[1][0] && or1[1][1] > or2[0][1] && or1[0][1] < or2[1][1];
+      var v1 = new Vertex(r1[0][0], r1[0][1]);
+      v1.next = new Vertex(r1[1][0], r1[1][1]);
+      var v2 = new Vertex(r2[0][0], r2[0][1]);
+      v2.next = new Vertex(r2[1][0], r2[1][1]);
+      assert(Vertex.rectOverlap(v1, v1.next, v2, v2.next) == overlaps, `unexpected overlap ${r1} ${r2}`);
     },
 
-    Vertex_rectOverlap: function() {
+    Vertex_intersectTest: function() {
+      var v = new Vertex(-0.5, 0);
+      v.next = new Vertex(0.5, 0);
+      for (var i = 0; i < 360; i += 9) {
+        var expected = i < 60 || i > 300 || (i > 120 && i < 240);
+        // calculate u as a rotation of [[0.5, -0.25], [0.5, 0.75]] around its midpoint.  Its 0-tip
+        // will be on v when it is rotated 60 degrees in either direction, and its 1-tip intersects
+        // when rotated 120 degrees.
+        var u0 = ut_rotate_cw(0, -0.5, Math.PI * i / 180);
+        var u1 = ut_rotate_cw(0, 0.5, Math.PI * i / 180);
+        var u = new Vertex(u0[0], u0[1] + 0.25);
+        u.next = new Vertex(u1[0], u1[1] + 0.25);
+        assert_equals(v.intersectTest(u), expected, `rotation=${i} ${v.xml()}${v.next.xml()} intersect ${u.xml()}${u.next.xml()}`);
+        assert_equals(u.intersectTest(v), expected);
+      }
+    },
+
+    Vertex_intersectEdges: function() {
+      var v = new Vertex(-0.5, 0);
+      v.next = new Vertex(0.5, 0);
+      for (var i = 0; i < 360; i += 9) {
+        var expectedToIntersect = i < 60 || i > 300 || (i > 120 && i < 240);
+        // (A) calculate u as a rotation of [[0.5, -0.25], [0.5, 0.75]] around its midpoint.  Its 0-tip
+        // will be on v when it is rotated 60 degrees in either direction, and its 1-tip intersects
+        // when rotated 120 degrees.
+        var theta = Math.PI * i / 180;
+        // rotate ((0, -1/2),(0, 1/2)) around the origin by theta
+        var u0 = ut_rotate_cw(0, -0.5, theta);
+        var u1 = ut_rotate_cw(0, 0.5, theta);
+        // then add (0, 1/4) to the result - this is the same as (A) above
+        var u = new Vertex(u0[0], u0[1] + 0.25);
+        u.next = new Vertex(u1[0], u1[1] + 0.25);
+        var t = [0];
+        intersection = u.intersectEdges(v, t);
+        if (expectedToIntersect == false) {
+          assert(intersection == null);
+          assert_equals(0, t[0]);
+        } else {
+          var cos = Math.cos(theta);
+          var expected_t = 0.5 - 1 / (4 * cos);
+          assert_near(expected_t, t[0], `i=${i}, u=${u.xml()}${u.next.xml()}`);
+          assert_near(Math.sqrt(1 - (1 / (cos * cos))) / 4, intersection.x);
+          assert_near(0, intersection.y);
+          assert_equals(false, intersection.is_crease);
+          // TODO: intersection.r 
+          // "remember z component of cross-product of the two intersecting edges - 
+          // it indicates the "handedness" of the intersection"
+
+        }
+      }
+    },
+
+    Vertex_join: function() {
     },
 
   },
@@ -222,6 +299,7 @@ var UT = {
     } catch (ex) {
       var stack = ex.stack;
       var stack_index = window.chrome ? 2 : 1;
+      // TODO: include stack frames up to the first one in unit-test.js
       if (ex.message) {
         UT.fail(test_target, ex.message + ': ' + stack.split('\n')[stack_index]);
       } else {

@@ -43,6 +43,9 @@ Fold.prototype.fold = function (a, a1) {
 }
 
 // THIS FUNCTION (unfold) NOT CURRENTLY IN USE
+// It was doing surgery to completely erase the effect of folding (no creases
+// left behind) and at some point we replaced it with Cutofld.unfold_once,
+// which leaves invisible creases behind
 Fold.prototype.unfold = function () {
     /*
       Called when unfolding; removes the fold, its twin, any other folds in their

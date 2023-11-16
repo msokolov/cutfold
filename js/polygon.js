@@ -6,8 +6,21 @@
  * A Polygon is made of a singly linked list of Vertices (see vertex.js).
  * The "top" is defined by the right hand rule, following the direction of
  * the linked list.
- */
 
+ * Note - the coordinate system has increasing values going down and to the right, like screen
+ * coords, and the vertical (row) coordinate comes first. However the code throughout calls the
+ * first coordinate x and the second one y! This may seem confusing at first, but it also continues
+ * to be confusing: it doesn't ever stop being confusing. In this code base x is vertical, y
+ * horizontal, and the origin is in the upper left hand corner. It all makes sense if you lay your
+ * head down on the desk, with your right ear pressed down firmly on your keyboard.
+ *
+ * Wait, empirical studies show we somehow have HTML Canvas behaving as if it had a coordinate
+ * system with the origin in the upper left, yet the horizontal dimension comes first. But how?
+ *
+ * Regarding a poly's orientation; if it is CCW we consider it to be face-up, according to the
+ * right-hand rule. Thus the initial polygon is always defined in a CCW manner.
+ *
+ */
 function Polygon (p) {
     /* If p is passed, a deep copy is made.  Otherwise a blank new Polygon is created. */
     if (p) {
@@ -184,8 +197,10 @@ Polygon.prototype.doDraw = function (g, n, show_vertices) {
         }
         // show vertices for diagnostic purposes:
         if (show_vertices) {
-            g.rect (xpoints[i]-1, ypoints[i]-1, 2, 2);
-            g.fillText (i + "", xpoints[i]-4 * i, ypoints[i]+12);
+            g.rect (xpoints[i]-1, ypoints[i] - 1, 2, 2);
+          // TODO: offset to the outside of the poly; according to whether the point
+          // is to the left, right, above or below the poly's centroid
+            g.fillText (i + "", xpoints[i] - 4 * i, ypoints[i]+12);
         }
         v = v.next;
         ++i;
@@ -197,9 +212,9 @@ Polygon.prototype.doDraw = function (g, n, show_vertices) {
 Polygon.prototype.fillPolygon = function (g, xp, yp, n) {
     g.beginPath();
     g.moveTo (xp[0], yp[0]);
-    //console.debug ("  moveTo (" + xp[0] + "," + yp[0] +")");
+    // console.debug ("  moveTo (" + xp[0] + "," + yp[0] +")");
     for (var i = 1; i < n; i++) {
-        //console.debug ("  lineTo (" + xp[i] + "," + yp[i] +")");
+        // console.debug ("  lineTo (" + xp[i] + "," + yp[i] +")");
         g.lineTo (xp[i], yp[i]);
     }
     g.closePath();
@@ -295,10 +310,10 @@ Polygon.prototype.fold = function (v, new_polys, fold_level, fold_index) {
             p1.flipme = true;
         }
         if (fa != null) {
-            fa.fold (a, a1); // split the fa fold in two
+            fa.fold(a, a1); // split the fa fold in two
         }
         if (fb != null) {
-            fb.fold (b1, b); // split the fb fold in two
+            fb.fold(b1, b); // split the fb fold in two
         }
     }
 }

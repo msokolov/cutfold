@@ -271,7 +271,7 @@ Cutfold.prototype.foldModel = function (x1, y1, x2, y2) {
     for (i = 0; i < npolys; i++) {
         // split all the polys intersected by the fold, modifying the existing polys
         // and creating new ones on the other side of the fold, storing those in new_polys
-        this.polys[i].fold (v1, new_polys, this.fold_level + 1, this.fold_index + 1);
+        this.polys[i].fold(v1, new_polys, this.fold_level + 1, this.fold_index + 1);
     }
     if (new_polys.length <= 0) {
         console.info ("foldModel aborting");

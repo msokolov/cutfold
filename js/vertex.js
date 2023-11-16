@@ -7,6 +7,7 @@
  * A Vertex is a point which also may be a vertex of a Polygon, one of a
  * linked list of vertices, and also represents the line segment (the edge
  * of the polygon) starting at that vertex.
+ *
  */
 
 function Vertex (x, y, v) {

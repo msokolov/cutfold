@@ -377,8 +377,8 @@ var UT = {
     },
 
     Polygon_draw() {
-      var canvas = document.getElementById('cutfold').getContext("2d");
-      Polygon.square50().draw(canvas, 100, 100, 1, true);
+      console.log(Polygon.square50().xml());
+      UT.draw_poly(Polygon.square50());
     },
 
     Polygon_fold1() {
@@ -392,7 +392,8 @@ var UT = {
       assert_valid_poly(p);
 
       // the original poly becomes the upper half (left of the fold)
-      // note the CCW orientation of its points; we always create CCW polys
+      // note the CCW orientation of its points; we preserve the poly's orientation;
+      // if it is CCW we consider it to be faceup, according to the right-hand rule
       var expected = create_poly([[-50, 10], [50, 10], [50, -50], [-50, -50]]);
       assert_poly_points_near(expected, p, "p1");
 
@@ -454,15 +455,10 @@ var UT = {
       assert(q.faceup);
     },
 
-      // TODO: add these cases:
-      // concave shape with separate lobes
-      // shape with a hole in it
-      // fold twice and check what happens to the folded folds
-
     Polygon_fold2() {
       // fold line having endpoint(s) inside the polygon
       var new_polys = [];
-      // a vertical line drawn from left to right
+      // a horizontal line drawn from left to right
       var line = new Vertex(0, 10, new Vertex(100, 10));
       var p = Polygon.square50();
       var square = new Polygon(p);
@@ -485,7 +481,54 @@ var UT = {
       // both points inside poly
       p.fold(new Vertex(20, 10, new Vertex(0, 10)), new_polys, 3, 7);
       assert_poly_points_near(square, p, "not folded");
-    }
+    },
+
+    Polygon_fold3() {
+      // concave shape with separate lobes
+      var p = create_poly([[-50, -50], [-50, 50], [0, 0], [50, 50], [50, -50]]);
+      // UT.draw_poly(p);
+      //console.log(p.xml());
+      var new_polys = [];
+      // a horizontal line drawn from right to left
+      var line = new Vertex(-100, 10, new Vertex(100, 10));
+      p.fold(line, new_polys, 0, 0);
+      UT.draw_poly(p);
+      //console.debug(p.xml())
+      // the folded polygon will be on the lhs of the fold starting with the last
+      // line segment where the line crosses the polygon
+      assert_poly_points_near(create_poly([[10, 10], [50, 10], [50, -50], [-50, -50], [-50, 10], [-10, 10], [0, 0]]), p, "p");
+      assert_equals(2, new_polys.length);
+      UT.draw_poly(new_polys[0]);
+      assert_poly_points_near(create_poly([[-10, 10], [-50, 10], [-50, 50]]), new_polys[0], "p1");
+      UT.draw_poly(new_polys[1]);
+      assert_poly_points_near(create_poly([[50, 10], [10, 10], [50, 50]]), new_polys[1], "p2");
+    },
+
+    Polygon_fold4() {
+      // concave shape with separate lobes
+      var p = create_poly([[-50, -50], [-50, 50], [0, 0], [50, 50], [50, -50]]);
+      var new_polys = [];
+      // a horizontal line drawn from right to left that passes through the vertex at (0, 0)
+      var line = new Vertex(-100, 0, new Vertex(100, 0));
+      p.fold(line, new_polys, 0, 0);
+      UT.draw_poly(p);
+      // the folded polygon will be on the lhs of the fold starting with the last
+      // line segment where the line crosses the polygon
+      // Note that vertex at the origin, where the line intersects, gets assigned to
+      // the only one side of the fold (not this one).
+      assert_poly_points_near(create_poly([[-50, 0], [50, 0], [50, -50], [-50, -50]]), p, "p");
+
+      // the other side is a *single* polygon with a single point connecting its two "lobes"
+      assert_equals(1, new_polys.length);
+      UT.draw_poly(new_polys[0]);
+      console.debug(new_polys[0].xml());
+      assert_poly_points_near(create_poly([[50, 0], [-50, 0], [-50, 50], [0, 0], [50, 50]]), new_polys[0], "p1");
+    },
+
+
+    // fold twice and check what happens to the folded folds
+    // but to test this we must track multiple polygons. In the app this is
+    // handled by Cutfold
 
   },
 
@@ -506,6 +549,7 @@ var UT = {
     //console.log(`Test: ${test_name}`);
     //console.log(test_target.parentNode);
     //console.log(UT.tests[test_name]);
+    UT.clear_canvas();
     try {
       var test_function = UT.tests[test_name];
       if (!test_function) {
@@ -544,5 +588,15 @@ var UT = {
   ok: function(test_target) {
     UT.test_output(test_target, "ok", "ut-ok");
   },
+
+  draw_poly: function(poly) {
+    var canvas = document.getElementById('cutfold').getContext("2d");
+    poly.draw(canvas, 200, 200, 1, true);
+  },
+
+  clear_canvas: function() {
+    var canvas = document.getElementById('cutfold').getContext("2d");
+    canvas.clearRect(0, 0, 1000, 1000);
+  }
 
 };

@@ -31,17 +31,16 @@ function Polygon (p) {
                 u.next = this.points;
                 break;
             }
-            var u1 = v.copy();
-            u.next = u1;
-            u = u1;
+            u.next = v.copy();
+            u = u.next;
         }
-        this.setPointsPoly ();
+        this.setPointsPoly();
     } else {
         this.points = null;
         this.id = Polygon.next_id++;
         this.z = 0;
         this.faceup = true;
-        this.fgcolor = Polygon.colors[this.id%10];
+        this.fgcolor = Polygon.colors[this.id % Polygon.colors.length];
 
         // These three flags are used to keep track of which polygons are to be
         // flipped when folding - we might combine them into a bit field...
@@ -63,6 +62,18 @@ Polygon.defcolor = "#aaaaaa";
 Polygon.crease_color = "#666688";
 Polygon.colors = ["#444488", "#774477", "#663344", "#446633", "#333366", "#666666", "#884488", "#992222", "#229922", "#222299",];
 
+Polygon.square50 = function () {
+  var last = new Vertex(-50, -50, null);
+  var v = new Vertex(50, -50, last);
+  v = new Vertex(50, 50, v);
+  v = new Vertex(-50, 50, v);
+  var square = new Polygon();
+  square.points = v;
+  last.next = v;
+  square.setPointsPoly();
+  return square;
+}
+
 Polygon.prototype.similar = function () {
     // make a "similar' polygon
     var new_poly = new Polygon ();
@@ -73,6 +84,7 @@ Polygon.prototype.similar = function () {
 }
 
 Polygon.prototype.computeBoundingBox = function () {
+  // adds new bound members to this Polygon
     this.left  = 1000;
     this.right =-1000;
     this.top   = 1000;
@@ -269,13 +281,13 @@ Polygon.prototype.fold = function (v, new_polys, fold_level, fold_index) {
         this.points = a;  // may be redundant, but sometimes needed...
 		    
         // set the poly links of all the points in p and p1
-        this.setPointsPoly ();
-        p1.setPointsPoly ();
+        this.setPointsPoly();
+        p1.setPointsPoly();
 		    
         // mark these polys as having determinate flippedness
         p1.is_anchor = true;
         this.is_anchor = true; 
-			  
+
         // determine which poly is on the right hand side of the fold and mark it.
         if (this.faceup) {
             this.flipme = true;

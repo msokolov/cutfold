@@ -106,8 +106,8 @@ Vertex.prototype.distanceSquared = function (v) {
  * true if the coordinates are within .0001
  */
 Vertex.prototype.near = function (v) {
-    return (Math.abs (v.x-this.x) < 0.0001 &&
-            Math.abs (v.y-this.y) < 0.0001);
+    return (Math.abs (v.x - this.x) < 0.0001 &&
+            Math.abs (v.y - this.y) < 0.0001);
 }
 
 /*

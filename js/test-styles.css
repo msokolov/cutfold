@@ -16,7 +16,6 @@
 }
 
 #unit-tests .ut-fail {
-    padding-top: 0.5em;
     padding-left: 1em;
     color: red;
     float: right;

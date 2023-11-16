@@ -8,6 +8,12 @@ function assert(cond, message) {
   }
 }
 
+function assert_null(item, message) {
+  if (item != null) {
+    throw new Error(message);
+  }
+}
+
 function assert_equals(a, b, message) {
   if (a != b) {
     if (message) {
@@ -27,6 +33,45 @@ function assert_near(a, b, message) {
       throw new Error(`${a} !~ ${b}`);
     }
   }
+}
+
+function assert_valid_poly(p) {
+  assert(p.z >= 0);
+  assert(p.faceup === true || p.faceup === false);
+  assert(p.flipme === true || p.flipme === false);
+  assert(p.visited === true || p.visited === false);
+  assert(p.is_anchor === true || p.is_anchor === false);
+  assert(p.points != null);
+  var v = p.points;
+  do {
+    assert(v.near(v.next) == false, `${v.xml()} should not be equal to its own next: ${v.next.xml()}`);
+    assert(v.poly === p);
+    // TODO: also check folds?
+    v = v.next;
+  } while (v != p.points);
+}
+
+function assert_poly_points_near(p, q, message) {
+  var pv = p.points, qv = q.points;
+  do {
+    assert(pv.near(qv), message + ` ${pv.xml()} != ${qv.xml()}`);
+    pv = pv.next;
+    qv = qv.next;
+  } while (pv != p.points);
+  assert(qv === q.points, message);
+}
+
+function create_poly(points) {
+  var p = new Polygon();
+  var first;
+  var last = new Vertex(points[points.length - 1][0], points[points.length - 1][1]);
+  var v = last;
+  for (var i = points.length - 2; i >= 0; i--) {
+    v = new Vertex(points[i][0], points[i][1], v);
+  }
+  last.next = v;
+  p.points = v;
+  return p;
 }
 
 function ut_rotate_cw(x, y, radians) {
@@ -259,8 +304,8 @@ var UT = {
           assert_near(Math.sqrt(1 - (1 / (cos * cos))) / 4, intersection.x);
           assert_near(0, intersection.y);
           assert_equals(false, intersection.is_crease);
-          // TODO: intersection.r 
-          // "remember z component of cross-product of the two intersecting edges - 
+          // TODO: intersection.r
+          // "remember z component of cross-product of the two intersecting edges -
           // it indicates the "handedness" of the intersection"
 
         }
@@ -268,7 +313,179 @@ var UT = {
     },
 
     Vertex_join: function() {
+      // untested since it is unused
     },
+
+    Polygon_ctor_empty() {
+      var id = Polygon.next_id;
+      var p = new Polygon();
+      assert_null(p.points);
+      assert_equals(id, p.id);
+      assert_equals(0, p.z);
+      assert_equals(true, p.faceup);
+      assert_equals(10, Polygon.colors.length);
+      assert_equals(Polygon.colors[id % 10], p.fgcolor);
+      assert_equals(false, p.flipme);
+      assert_equals(false, p.visited);
+      assert_equals(false, p.is_anchor);
+      var q = new Polygon();
+      assert_equals(id + 1, q.id);
+    },
+
+    Polygon_square50() {
+      var p = Polygon.square50();
+      assert(p.points != null);
+      assert_equals(p.points, p.points.next.next.next.next);
+      assert_valid_poly(p);
+      var v0 = new Vertex(-50, 50, null)
+      assert(p.points.near(v0));
+    },
+
+    Polygon_ctor_copy() {
+      try {
+        new Polygon(new Polygon());
+        assert_equals(false, true, "expected exception not thrown");
+      } catch (ex) {
+      }
+      var poly = Polygon.square50();
+      var poly2 = new Polygon(poly);
+      assert_valid_poly(poly2);
+      assert_equals(poly.id, poly2.id);
+      var u = poly.points, v = poly2.points;
+      do {
+        assert(v.near(u));
+        u = u.next;
+        v = v.next;
+      } while (u != poly.points);
+      assert(v == poly2.points);
+    },
+
+    Polygon_similar() {
+      var square = Polygon.square50();
+      var other = square.similar();
+      assert(other.points == null);
+      assert(other.fgcolor != square.fgcolor);
+    },
+
+    Polygon_bounding_box() {
+      var square = Polygon.square50();
+      square.computeBoundingBox();
+      assert_equals(-50, square.left);
+      assert_equals(50, square.right);
+      assert_equals(-50, square.top);
+      assert_equals(50, square.bottom);
+    },
+
+    Polygon_draw() {
+      var canvas = document.getElementById('cutfold').getContext("2d");
+      Polygon.square50().draw(canvas, 100, 100, 1, true);
+    },
+
+    Polygon_fold1() {
+      // simple convex shape with two intersecting points
+      var new_polys = [];
+      // a horizontal line drawn from left to right
+      var line = new Vertex(-100, 10, new Vertex(100, 10));
+      var p = Polygon.square50();
+      // this will modify its input! and output only the newly-created polygons in new_polys
+      p.fold(line, new_polys, 3, 7);
+      assert_valid_poly(p);
+
+      // the original poly becomes the upper half (left of the fold)
+      // note the CCW orientation of its points; we always create CCW polys
+      var expected = create_poly([[-50, 10], [50, 10], [50, -50], [-50, -50]]);
+      assert_poly_points_near(expected, p, "p1");
+
+      assert_equals(1, new_polys.length);
+
+      var q = new_polys[0];
+      assert_valid_poly(q);
+      // the new poly is the lower half (right of the fold)
+      expected = create_poly([[50, 10], [-50, 10], [-50, 50], [50, 50]]);
+      assert_poly_points_near(expected, q, "q1");
+
+      var pf = p.points.fold;
+      var qf = q.points.fold;
+      assert_equals(3, pf.level);
+      assert_equals(7, pf.index);
+      assert_equals(3, qf.level);
+      assert_equals(7, qf.index);
+      assert_equals(pf, qf.twin);
+      assert_equals(qf, pf.twin);
+
+      // we pick a side based on the orientation of the cut. p is on the "left hand side"
+      assert_equals(true, p.flipme);
+      assert(p.faceup); // until it gets flipped
+      assert_equals(false, q.flipme);
+      assert(q.faceup);
+      // TBD: what is this about?
+      assert(p.is_anchor);
+      assert(q.is_anchor);
+
+      p = Polygon.square50();
+      // draw fold line from right to left
+      line = new Vertex(100, 10, new Vertex(-100, 10));
+      new_polys = []
+      p.fold(line, new_polys, 2, 5);
+      assert_valid_poly(p);
+      assert_equals(1, new_polys.length);
+
+      // the original poly becomes the bottom half, again to lhs of the fold
+      expected = create_poly([[50, 10], [-50, 10], [-50, 50], [50, 50]]);
+      assert_poly_points_near(expected, p, "p2");
+
+      q = new_polys[0];
+      assert_valid_poly(q);
+      expected = create_poly([[-50, 10], [50, 10], [50, -50], [-50, -50]]);
+      assert_poly_points_near(expected, q, "q2");
+
+      var pf = p.points.fold;
+      var qf = q.points.fold;
+      assert_equals(2, pf.level);
+      assert_equals(5, pf.index);
+      assert_equals(2, qf.level);
+      assert_equals(5, qf.index);
+      assert_equals(pf, qf.twin);
+      assert_equals(qf, pf.twin);
+
+      assert_equals(true, p.flipme);
+      assert(p.faceup);
+      assert_equals(false, q.flipme);
+      assert(q.faceup);
+    },
+
+      // TODO: add these cases:
+      // concave shape with separate lobes
+      // shape with a hole in it
+      // fold twice and check what happens to the folded folds
+
+    Polygon_fold2() {
+      // fold line having endpoint(s) inside the polygon
+      var new_polys = [];
+      // a vertical line drawn from left to right
+      var line = new Vertex(0, 10, new Vertex(100, 10));
+      var p = Polygon.square50();
+      var square = new Polygon(p);
+      // this will modify its input! and output only the newly-created polygons in new_polys
+      p.fold(line, new_polys, 3, 7);
+      assert_valid_poly(p);
+
+      // no folding done
+      assert_poly_points_near(square, p, "not folded");
+      assert_equals(0, new_polys.length);
+
+      assert_equals(false, p.flipme);
+      assert(p.faceup);
+      assert(p.is_anchor == false);
+
+      // end point inside poly
+      p.fold(new Vertex(100, 10, new Vertex(0, 10)), new_polys, 3, 7);
+      assert_poly_points_near(square, p, "not folded");
+      
+      // both points inside poly
+      p.fold(new Vertex(20, 10, new Vertex(0, 10)), new_polys, 3, 7);
+      assert_poly_points_near(square, p, "not folded");
+    }
 
   },
 

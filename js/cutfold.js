@@ -120,7 +120,7 @@ Cutfold.prototype.rescale_canvas = function (canvas, delay, repaint) {
     this.scale_time = delay;
     console.debug ("xoff="+this.xoff+", yoff="+this.yoff+" scale="+this.scale);
     console.debug ("target xoff="+this.xoff_target+", yoff="+this.yoff_target+" scale="+this.scale_target);
-    if (repaint) { 
+    if (repaint) {
         this.repaint ();
     }
 }
@@ -172,16 +172,8 @@ Cutfold.prototype.reset = function () {
 }
 
 Cutfold.prototype.default_model = function () {
-    // Initialize square piece of paper 
-    var last = new Vertex(-50, -50, null);
-	  var v = new Vertex(50, -50, last);
-	  v = new Vertex(50, 50, v);
-	  v = new Vertex(-50, 50, v);
-	  var square = new Polygon();
-	  square.points = v;
-	  last.next = v;
-    square.setPointsPoly ();
-	  this.polys.push (square);
+  // Initialize square piece of paper
+  this.polys.push(Polygon.square50());
 }
 
 // recalculate some cached data structures when the geometry or topology changes
@@ -204,7 +196,7 @@ Cutfold.prototype.refresh = function (axis) {
 
 /*
  * rhsTest
- *  checks which side of (x1,y1)->(x2, y2) (x,y) is on; returns 
+ *  checks which side of (x1,y1)->(x2, y2) (x,y) is on; returns
  *  a boolean indicating whether it's on the rhs (or on the line itself).
  */
 Cutfold.prototype.rhsTest = function (x1, y1, x2, y2, x, y) {
@@ -252,7 +244,7 @@ Cutfold.prototype.undo = function () {
  * obstruction of a folding poly by another poly above or below it that is
  * not being folded.  In this case we could either prevent the fold or
  * possibly "tuck" the fold in an interior layer.  In any case all that
- * stuff would require a bunch of expensive geometry. 
+ * stuff would require a bunch of expensive geometry.
  *
  *   Each of the polygons in the model is tested for intersection with the line segment,
  *   and possibly split.
@@ -295,7 +287,7 @@ Cutfold.prototype.foldModel = function (x1, y1, x2, y2) {
     this.polys_tween_copy = this.copyModel ();
     Polygon.sort (this.polys_tween_copy, false);
 
-    // traverse the polygon graph, propagating the flipme flag to 
+    // traverse the polygon graph, propagating the flipme flag to
     // mark the dependent polygons to be folded.
     var p = new_polys[0];
     p.markPolyGraph (p.flipme, null, this.fold_index + 1);
@@ -320,9 +312,9 @@ Cutfold.prototype.foldModel = function (x1, y1, x2, y2) {
  * unfoldable? Nope.  It seems that because we don't remove folds after
  * they're unfolded (they remain, albeit flattened out, as creases), the
  * bottom-most poly we happen to choose may not actually lie on a fold
- * (just a crease).  So try them all until we find one... 
+ * (just a crease).  So try them all until we find one...
  */
- 
+
 Cutfold.prototype.unfold_once = function () {
     console.debug ("unfold,level=" + this.fold_level);
     if (this.fold_level <= 0) {
@@ -406,7 +398,7 @@ Cutfold.prototype.unfold_once = function () {
       }
     */
     for (var i=0; i<j; i++) {
-        // instead of erasing creases, just mark them so they can be displayed 
+        // instead of erasing creases, just mark them so they can be displayed
         // differently
         if (creases[i] != null) {
             creases[i].fold.mark_creases ();
@@ -432,13 +424,13 @@ Cutfold.prototype.cullEmptyPolys = function (polys) {
 Cutfold.prototype.initCut = function (v) {
     var min_dist = 5;
     this.globalToLocal (v);
-    // TBD figure out if what it says just below is really true and 
+    // TBD figure out if what it says just below is really true and
     // maybe remove the following test:
 /*
         for (int i=0; i<polys.length; i++) {
             // only allow cuts to start outside the paper.  This avoids
             // a buggy situation I think.  If you start and end inside the
-            // poly and the edge connecting your first and last points 
+            // poly and the edge connecting your first and last points
             // leaves (and re-enters) the polygon then cutModel is broken
             if (getPoly (i).encloses (v)) {
                 return false;
@@ -458,7 +450,7 @@ Cutfold.prototype.initCut = function (v) {
     return true;
 }
 
-Cutfold.prototype.cutSelect = function (v, close_pcut) { 
+Cutfold.prototype.cutSelect = function (v, close_pcut) {
 
     var min_dist = 5;
     // check for intersections w/pcut, and if there is one then form
@@ -468,14 +460,14 @@ Cutfold.prototype.cutSelect = function (v, close_pcut) {
     var u, ux = null, ex = null, start;
     u = this.pcut.points;
     while (u.next != null) {
-        // advance u to the end of the linked list - 
+        // advance u to the end of the linked list -
         // this will be the first point selected
         u = u.next;
         if (u == this.pcut.points) {
             // don't go infinite looping
             break;
         }
-    } 
+    }
 
     if (close_pcut) {
         // the user double-clicked, so pretend they clicked on exactly
@@ -494,7 +486,7 @@ Cutfold.prototype.cutSelect = function (v, close_pcut) {
             }
         }
         // TBD - we should try cutting withour closing pcut if possible
-        //  - change this so only we test only for 
+        //  - change this so only we test only for
         // explicit self - intersections; don't create this link; leave
         // pcut open.
         /*
@@ -531,7 +523,7 @@ Cutfold.prototype.cutSelect = function (v, close_pcut) {
             ux = uxx;
             ex = u;
         }
-    } 
+    }
     if (ux != null) {
         // just use the closed part of the polygon for cutting?
         // lops off the tails
@@ -543,7 +535,7 @@ Cutfold.prototype.cutSelect = function (v, close_pcut) {
     }
     u.next = this.pcut.points;
     this.pcut.points = u;
-    
+
     if (ux != null) {
         return true;        // go ahead and cut
     }
@@ -551,7 +543,7 @@ Cutfold.prototype.cutSelect = function (v, close_pcut) {
     g.rect (v.x-2, v.y-2, v.x+2, v.y-2);
     console.debug  ("cutSelect return false");
     return false;           // continue selecting
-} 
+}
 
 Cutfold.prototype.cutModel = function () {
     var new_polys = [];
@@ -563,7 +555,7 @@ Cutfold.prototype.cutModel = function () {
     this.enable_undo (true);
 
     console.debug ("cutModel");
-        
+
     var npolys = this.polys.length;
     this.pcut.computeBoundingBox ();
     for (i = 0; i < npolys; i++) {
@@ -690,11 +682,11 @@ Cutfold.prototype.discardPolygon = function (v) {
 /************************************************************************
  * polygon manipulation: cutting and folding
  ************************************************************************/
- 
+
 Cutfold.prototype.reflectMarkedPolys = function (polys, v1, v2, zlevels) {
     var npolys = this.polys.length;
 	
-    // fold all the marked polygons now.  These will be the ones on the flipme 
+    // fold all the marked polygons now.  These will be the ones on the flipme
     // side of the fold or connected via earlier folds to one on the flipme.
     for (var i = 0; i<npolys; i++) {
         var p = this.polys[i];
@@ -716,7 +708,7 @@ Cutfold.prototype.clearPolyFlags = function (polys) {
 public String getAppletInfo() {
         return "Title: Cutfold\ncopyright &copy; 2003 Mike Sokolov.";
     }
-  
+
 public String[][] getParameterInfo() {
         String[][] info = {
             { "model", "url", "snowflake XML file to load" },
@@ -738,7 +730,7 @@ Cutfold.prototype.tweenModel = function (g) {
     var t = new Date().getTime();
     var ratio = 1.0;
     /*
-    console.debug ("tweenModel, scale_time=" + this.scale_time + 
+    console.debug ("tweenModel, scale_time=" + this.scale_time +
                    ", scale_start=" + this.scale_start +
                    ", scale_target=" + this.scale_target);
     */
@@ -760,7 +752,7 @@ Cutfold.prototype.tweenModel = function (g) {
     }
 
     if (this.polys_tween_copy) {
-        // In the first half of the tween, use the "before" stacking order 
+        // In the first half of the tween, use the "before" stacking order
         // (tween_map is used to map to the "destination" polys)
         // and in the second half, update the tween_map so we can use the
         // "destination" stacking order
@@ -852,7 +844,7 @@ Cutfold.prototype.print = function () {
     }
 }
 
-Cutfold.prototype.checkModel = function (polys) 
+Cutfold.prototype.checkModel = function (polys)
 {
     // console.debug ("ENTER checkModel");
     for (var i = 0; i<polys.length; i++) {
@@ -919,7 +911,7 @@ Cutfold.prototype.getGraphics = function () {
     return this.canvas.getContext("2d");
 }
 
-Cutfold.prototype.drawDiamond = function (v, c) 
+Cutfold.prototype.drawDiamond = function (v, c)
 {
     var g = this.getGraphics ();
     g.setColor (c);
@@ -936,7 +928,7 @@ Cutfold.prototype.enable_undo = function (b) {
 Cutfold.prototype.getPoly = function (i) {
     return this.polys[i];
 }
-    
+
 function htmlEscape(str) {
     return String(str)
         .replace(/&/g, '&amp;')
@@ -974,7 +966,7 @@ Cutfold.postCallback = function () {
 }
 
 // TODO: read model from URL
-Cutfold.prototype.load_model = function (model_path) { 
+Cutfold.prototype.load_model = function (model_path) {
     get_request (model_path, Cutfold.onLoadModel, this);
 }
 
@@ -996,7 +988,7 @@ Cutfold.onLoadModel = function (xmlhttp, cutfold) {
         for (var j = 0; j < nodes.length; j++) {
             var node = nodes.item (j);
             if (node.nodeName == "vertex") {
-                var v = new Vertex (parseFloat(node.getAttribute("x")), 
+                var v = new Vertex (parseFloat(node.getAttribute("x")),
                                     parseFloat(node.getAttribute("y") + 0));
                 v.is_crease = node.getAttribute("is_crease") == "true";
                 v.id = parseInt(node.getAttribute("id"));
@@ -1055,10 +1047,10 @@ Cutfold.onLoadModel = function (xmlhttp, cutfold) {
 * Provides requestAnimationFrame in a cross browser way.
 * @author paulirish / http://paulirish.com/
 */
- 
+
 if ( !window.requestAnimationFrame ) {
     window.requestAnimationFrame = ( function() {
- 
+
         return window.webkitRequestAnimationFrame ||
             window.mozRequestAnimationFrame ||
             window.oRequestAnimationFrame ||
